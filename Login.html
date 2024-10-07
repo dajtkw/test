@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập hệ thống thi online</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            box-sizing: border-box; /* Thêm dòng này để cân bằng */
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .signup-link a {
+            text-decoration: none;
+            color: #4CAF50;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Đăng nhập</h2>
+        <form id="login-form">
+            <input type="email" name="email" placeholder="Email" required />
+            <input type="password" name="password" placeholder="Mật khẩu" required />
+            <div id="error-message" class="error" style="color: red;"></div> <!-- Nơi hiển thị thông báo lỗi -->
+            <button type="submit">Đăng nhập</button>
+        </form>
+        <div class="signup-link">
+            <p>Bạn chưa có tài khoản? <a href="/signup">Đăng ký ngay</a></p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Ngăn chặn gửi form mặc định
+    
+            const formData = new FormData(this);
+            const response = await fetch('/login', {
+                method: 'POST',
+                body: new URLSearchParams(formData) // Sử dụng URLSearchParams để gửi dữ liệu
+            });
+    
+            const errorMessageElement = document.getElementById('error-message');
+            errorMessageElement.textContent = ""; // Đặt lại thông báo lỗi
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                errorMessageElement.textContent = errorData.message; // Hiển thị thông báo lỗi
+            } else {
+                // Xử lý khi đăng nhập thành công (chuyển hướng)
+                const successData = await response.json();
+                alert(successData.message); // Nếu muốn thông báo, có thể hiển thị alert
+                window.location.href = '/submit-quiz'; // Chuyển hướng đến dashboard hoặc trang chính
+            }
+        });
+    </script>
+</body>
+</html>
