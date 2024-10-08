@@ -2,6 +2,9 @@ import express from 'express';
 import path from 'path';
 import bcrypt from "bcryptjs";
 import User from './models/user.model.js';
+import Question from './models/question.model.js';
+import bodyParser from 'body-parser';
+import session from 'express-session';
 
 import { connectDB } from "./lib/db.js";
 import { fileURLToPath } from 'url';
@@ -15,16 +18,18 @@ const app = express();
 //convert data into Json
 app.use(express.json());
 
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(express.static("frontend/pages"));
 
 const PORT = 5000;
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Login.html')); 
+    res.sendFile(path.join(__dirname, '../frontend/pages/Login.html')); 
 });
 
 app.get('/signup', (req, res) => {
-    res.sendFile(path.join(__dirname, '../SignUp.html')); 
+    res.sendFile(path.join(__dirname, '../frontend/pages/SignUp.html')); 
 })
 
 app.post('/signup', async (req, res) => {
@@ -96,9 +101,59 @@ app.post('/login', async (req, res) => {
 	}
 });
 
-app.get('/submit-quiz', (req, res) => {
-    res.sendFile(path.join(__dirname, '../question.html')); 
+//Thêm câu hỏi
+app.post('/api/questions', async (req, res) => {
+    const { question, options, answer } = req.body;
+    console.log('Received:', { question, options, answer }); 
+
+    if (!question || !options || !answer) {
+        return res.status(400).send('Missing fields');
+    }
+
+    const newQuestion = new Question({
+        question,
+        options,
+        answer
+    });
+    
+    await newQuestion.save();
+    res.status(201).send('Question added successfully!');
 });
+
+// API sửa câu hỏi
+app.put('/api/questions/:id', async (req, res) => {
+    const { question, options, answer } = req.body;
+    await Question.findByIdAndUpdate(req.params.id, { question, options, answer });
+    res.send('Question updated successfully!');
+});
+
+app.get('/prepareToExam', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/pages/prepareToExam.html')); 
+});
+
+
+app.get('/api/questions', async (req, res) => {
+    const questions = await Question.find();
+    res.json(questions);
+});
+
+app.post('/api/result', async (req, res) => {
+    const userAnswers = req.body;
+    const questions = await Question.find();
+    let score = 0;
+    
+    questions.forEach((question, index) => {
+        if (userAnswers[`question${index}`] === question.answer) {
+            score++;
+        }
+    });
+    
+    // Gửi dữ liệu kết quả ra client
+    res.json({ score, total: questions.length });
+});
+
+
+
 
 
 app.listen(PORT, () => {

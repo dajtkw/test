@@ -106,7 +106,7 @@
                 // Xử lý khi đăng nhập thành công (chuyển hướng)
                 const successData = await response.json();
                 alert(successData.message); // Nếu muốn thông báo, có thể hiển thị alert
-                window.location.href = '/submit-quiz'; // Chuyển hướng đến dashboard hoặc trang chính
+                window.location.href = 'frontend/pages/prepareToExam'; 
             }
         });
     </script>

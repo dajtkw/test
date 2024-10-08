@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả</title>
+</head>
+<body>
+    <h1>Kết Quả Thi</h1>
+    <p id="resultMessage"></p>
+    <a href="index.html">Về Trang Chủ</a>
+
+    <script>
+        // Lấy tham số từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const score = urlParams.get('score');
+        const total = urlParams.get('total');
+
+        document.getElementById('resultMessage').innerText = `Bạn đã trả lời đúng ${score} trên ${total} câu hỏi.`;
+    </script>
+</body>
+</html>
