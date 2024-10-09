@@ -75,7 +75,7 @@
 <body>
     <div class="login-container">
         <h2>Đăng nhập</h2>
-        <form id="login-form">
+        <form id="login-form" action="/login" method="post">
             <input type="email" name="email" placeholder="Email" required />
             <input type="password" name="password" placeholder="Mật khẩu" required />
             <div id="error-message" class="error" style="color: red;"></div> <!-- Nơi hiển thị thông báo lỗi -->
@@ -87,28 +87,36 @@
     </div>
     
     <script>
-        document.getElementById('login-form').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Ngăn chặn gửi form mặc định
+        document.querySelector('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
     
-            const formData = new FormData(this);
-            const response = await fetch('/login', {
-                method: 'POST',
-                body: new URLSearchParams(formData) // Sử dụng URLSearchParams để gửi dữ liệu
-            });
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
     
-            const errorMessageElement = document.getElementById('error-message');
-            errorMessageElement.textContent = ""; // Đặt lại thông báo lỗi
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
     
-            if (!response.ok) {
-                const errorData = await response.json();
-                errorMessageElement.textContent = errorData.message; // Hiển thị thông báo lỗi
-            } else {
-                // Xử lý khi đăng nhập thành công (chuyển hướng)
-                const successData = await response.json();
-                alert(successData.message); // Nếu muốn thông báo, có thể hiển thị alert
-                window.location.href = 'frontend/pages/prepareToExam'; 
+                const result = await response.json();
+    
+                if (response.ok) {
+                    // Chuyển hướng nếu đăng nhập thành công
+                    alert("Đăng nhập thành công");
+                    window.location.href = "/prepareToExam"; 
+                } else {
+                    // Hiển thị lỗi nếu có
+                    alert(result.message || "Đã xảy ra lỗi");
+                }
+            } catch (error) {
+                console.error("Error:", error);
             }
         });
     </script>
+    
 </body>
 </html>

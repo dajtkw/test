@@ -4,6 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thi Trắc Nghiệm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* Màu nền nhẹ nhàng */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333; /* Màu tiêu đề */
+            margin-bottom: 20px;
+        }
+
+        #quizForm {
+            background: white; /* Nền trắng cho form */
+            padding: 20px;
+            border-radius: 8px; /* Bo tròn các góc */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho form */
+            width: 100%;
+            max-width: 600px; /* Chiều rộng tối đa */
+        }
+
+        #questions div {
+            margin-bottom: 15px; /* Khoảng cách giữa các câu hỏi */
+        }
+
+        button {
+            background-color: #007BFF; /* Màu nền nút */
+            color: white; /* Màu chữ nút */
+            padding: 10px 20px; /* Padding cho nút */
+            border: none; /* Không có viền */
+            border-radius: 5px; /* Bo tròn cho nút */
+            font-size: 1em; /* Kích thước chữ cho nút */
+            cursor: pointer; /* Con trỏ chuột cho nút */
+            transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Màu nền khi hover */
+        }
+
+        /* Thiết lập cho phần câu hỏi */
+        p {
+            font-weight: bold; /* In đậm câu hỏi */
+        }
+    </style>
 </head>
 <body>
     <h1>Thi Trắc Nghiệm</h1>
