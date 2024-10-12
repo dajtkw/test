@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng ký tài khoản</title>
     <style>
+
+header {
+            position: fixed; /* Định vị cố định header */
+            top: 0; /* Đặt header ở vị trí trên cùng */
+            left: 0;
+            right: 0; /* Mở rộng header ra toàn bộ chiều rộng */
+            background-color: #4CAF50; /* Nền màu xanh lá cho header */
+            padding: 15px 0; /* Khoảng cách trong header */
+            display: flex; /* Sử dụng flexbox để sắp xếp các phần tử */
+            justify-content: center; /* Căn giữa theo chiều ngang */
+            align-items: center; /* Canh giữa theo chiều dọc */
+            z-index: 1000; /* Đảm bảo header ở trên cùng */
+        }
+
+        .logo {
+            font-size: 24px; /* Kích thước lớn hơn cho logo */
+            color: white; /* Màu chữ trắng */
+            font-weight: bold; /* Chữ đậm */
+            text-decoration: none; /* Bỏ gạch chân cho liên kết */
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
@@ -77,6 +98,10 @@
 </head>
 <body>
     <div class="signup-container">
+        <header>
+            <a class="logo" href="/">DDH TEAM</a> 
+        </header>
+    
         <h2>Đăng ký</h2>
         <form id="signup-form" action="/signup" method="post">
             <input type="text" id="fullName" name="fullname" placeholder="Họ và tên" required />

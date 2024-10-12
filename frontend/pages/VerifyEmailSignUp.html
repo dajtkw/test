@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác thực Mã</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(to right, #d9ffdb, #a8e6cf);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #1f6f1f;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-container {
+            margin: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 18px;
+            width: 200px;
+            text-align: center;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #d9534f;
+            /* Màu đỏ cho thông báo lỗi */
+        }
+
+        .success {
+            color: #5cb85c;
+            /* Màu xanh lá cho thông báo thành công */
+        }
+    </style>
+</head>
+
+<body>
+    <form id="verify-form">
+        <h1>Xác thực Mã</h1>
+        <div class="input-container">
+            <input type="text" id="verificationCode" name ="code" maxlength="6" placeholder="Nhập 6 mã" />
+        </div>
+        <button id="verifyBtn">Xác thực</button>
+        <div id="message" class="message"></div>
+    </form>
+    <script>
+        document.getElementById('verify-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/verify-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Chuyển hướng nếu xác thực thành công
+                    window.location.href = "/login"; 
+                } else {
+                    // Hiển thị lỗi nếu có
+                    alert(result.message || "Đã xảy ra lỗi");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        });
+    </script>
+</body>
+
+</html>

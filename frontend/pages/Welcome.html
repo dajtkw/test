@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chào Mừng</title>
+    <style>
+         header {
+            position: fixed; /* Định vị cố định header */
+            top: 0; /* Đặt header ở vị trí trên cùng */
+            left: 0;
+            right: 0; /* Mở rộng header ra toàn bộ chiều rộng */
+            background-color: #4CAF50; /* Nền màu xanh lá cho header */
+            padding: 15px 0; /* Khoảng cách trong header */
+            display: flex; /* Sử dụng flexbox để sắp xếp các phần tử */
+            justify-content: center; /* Căn giữa theo chiều ngang */
+            align-items: center; /* Canh giữa theo chiều dọc */
+            z-index: 1000; /* Đảm bảo header ở trên cùng */
+        }
+
+        .logo {
+            font-size: 24px; /* Kích thước lớn hơn cho logo */
+            color: white; /* Màu chữ trắng */
+            font-weight: bold; /* Chữ đậm */
+            text-decoration: none; /* Bỏ gạch chân cho liên kết */
+
+        }
+
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(to right, #d9ffdb, #a8e6cf);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+
+
+        h1 {
+            color: #1f6f1f;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .button {
+            margin: 10px;
+            padding: 12px 24px;
+            color: white;
+            background-color: #4CAF50;
+            /* Màu xanh lá */
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+            /* Màu xanh lá tối hơn khi hover */
+            transform: translateY(-2px);
+            box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a class="logo" href="/">DDH TEAM</a> 
+    </header>
+
+
+    <h1>DDH TEAM chào mừng đến với trang web luyện thi của chúng tôi!</h1>
+    <button class="button" id="signupBtn">Đăng ký</button>
+    <button class="button" id="loginBtn">Đăng nhập</button>
+
+    <script>
+        document.getElementById('signupBtn').onclick = function () {
+            alert('Đi tới trang đăng ký');
+            window.location.href = 'signup.html';
+        };
+        document.getElementById('loginBtn').onclick = function () {
+            alert('Đi tới trang đăng nhập')
+            window.location.href = 'login.html';
+        };
+    </script>
+
+</body>
+
+</html>
