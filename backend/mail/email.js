@@ -1,6 +1,7 @@
 import {
   PASSWORD_RESET_REQUEST_TEMPLATE,
   PASSWORD_RESET_SUCCESS_TEMPLATE,
+  SEND_WELCOME_TEMPLATE,
   VERIFICATION_EMAIL_TEMPLATE,
 } from "./emailTemplates.js";
 import nodemailer from "nodemailer";
@@ -58,11 +59,10 @@ export const sendWelcomeEmail = async (email, name) => {
     let info = await transport.sendMail({
       from: '"DDH Team" <btd1462004@gmail.com>',
       to: email,
-      template_uuid: "2e435233-9af9-4836-94fc-943c25b7b06d",
-      template_variables: {
-        company_info_name: "DDH Team",
-        name: name,
-      },
+      subject: "Welcome Email",
+      html:SEND_WELCOME_TEMPLATE,
+      category: "Welcome Email"
+      
     });
 
     console.log("Email sent successfully", info);

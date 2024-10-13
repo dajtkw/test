@@ -1,12 +1,22 @@
+// import express from "express";
+// import cookieParser from 'cookie-parser';
 import jwt from "jsonwebtoken";
-
+// const app = express(); 
+// app.use(cookieParser());
 export const verifyToken = (req, res, next) => {
 	const token = req.cookies.token;
-	if (!token) return res.status(401).json({ success: false, message: "Unauthorized - no token provided" });
+	console.log(token);
+	if (!token) {
+		
+		return res.redirect('/login');
+	} 
 	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET);
+		const decoded = jwt.verify(token, 'your_secret_key');
 
-		if (!decoded) return res.status(401).json({ success: false, message: "Unauthorized - invalid token" });
+		if (!decoded) {
+			
+			return res.redirect('/login');
+		} 
 
 		req.userId = decoded.userId;
 		next();

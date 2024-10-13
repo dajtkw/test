@@ -28,7 +28,8 @@
             margin: 10px;
         }
 
-        input[type="text"] {
+        input[type="text"],
+        input[type="email"] {
             padding: 10px;
             font-size: 18px;
             width: 200px;
@@ -57,12 +58,6 @@
             margin-top: 20px;
             font-size: 18px;
             color: #d9534f;
-            /* Màu đỏ cho thông báo lỗi */
-        }
-
-        .success {
-            color: #5cb85c;
-            /* Màu xanh lá cho thông báo thành công */
         }
     </style>
 </head>
@@ -70,13 +65,33 @@
 <body>
     <form id="verify-form">
         <h1>Xác thực Mã</h1>
+        <p id="verification-message"></p>
         <div class="input-container">
-            <input type="text" id="verificationCode" name ="code" maxlength="6" placeholder="Nhập 6 mã" />
+            <input type="text" id="verificationCode" name="code" maxlength="6" placeholder="Nhập 6 mã" required />
         </div>
-        <button id="verifyBtn">Xác thực</button>
+        <button type="submit" id="verifyBtn">Xác thực</button>
         <div id="message" class="message"></div>
     </form>
+
     <script>
+        // Function to get query parameters
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                email: params.get('email')
+            };
+        }
+
+        // Get the user's email from the query parameters and display it
+        const { email } = getQueryParams();
+        if (email) {
+            document.getElementById('verification-message').innerHTML = 
+                `A verification email has been sent to <strong>${email}</strong>. Please check your inbox to verify your account.`;
+        } else {
+            document.getElementById('verification-message').innerHTML = 
+                `Email verification failed. Please try again.`;
+        }
+
         document.getElementById('verify-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -95,17 +110,19 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Chuyển hướng nếu xác thực thành công
-                    window.location.href = "/login"; 
+                    // Redirect if verification is successful
+                    window.location.href = "/login";
                 } else {
-                    // Hiển thị lỗi nếu có
-                    alert(result.message || "Đã xảy ra lỗi");
+                    // Display error if any
+                    document.getElementById('message').innerText = result.message || "Đã xảy ra lỗi";
                 }
             } catch (error) {
                 console.error("Error:", error);
+                document.getElementById('message').innerText = "Đã xảy ra lỗi kết nối";
             }
         });
     </script>
 </body>
+
 
 </html>
