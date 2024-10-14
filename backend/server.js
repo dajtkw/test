@@ -224,13 +224,9 @@ app.post("/login", async (req, res) => {
 	await sendVerificationEmail(user.email, verificationToken);
     user.lastLogin = new Date();
     await user.save();
-    res.status(200).json({
-      success: true,
-      message: "Logged in successfully",
-      user: {
-        ...user._doc,
-        password: undefined,
-      },
+    
+    res.status(201).json({
+      redirectUrl: `/verify-email-login?email=${encodeURIComponent(user.email)}`,
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
@@ -378,6 +374,28 @@ app.put("/api/questions/:id", async (req, res) => {
 
 app.get("/api/prepareToExam", verifyToken, (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/pages/prepareToExam.html"));
+});
+
+app.get('/api/userInfo',verifyToken, async(req, res) => {
+  const user = await User.findById(req.userId);
+  console.log(user);
+  if (user) {
+      // Trả về thông tin người dùng
+      res.json({
+          success: true,
+          user: {
+              name: user.fullname,
+              dob:user.DayOfBirth,
+              email: user.email,
+              cccd: user.cccd,
+          }
+      });
+  } else {
+      res.json({
+          success: false,
+          message: "Người dùng chưa đăng nhập"
+      });
+  }
 });
 
 app.post("/api/prepareToExam", verifyToken, async (req, res) => {

@@ -150,7 +150,7 @@
                 if (response.ok) {
                     // Chuyển hướng nếu đăng nhập thành công
                     alert("Xác thực tài khoản");
-                    window.location.href = "/verify-email-login"; 
+                    window.location.href = result.redirectUrl;; 
                 } else {
                     // Hiển thị lỗi nếu có
                     alert(result.message || "Đã xảy ra lỗi");
