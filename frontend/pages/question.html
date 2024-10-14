@@ -31,6 +31,8 @@
 
         #questions div {
             margin-bottom: 15px; /* Khoảng cách giữa các câu hỏi */
+            padding-bottom: 10px; /* Khoảng cách dưới cùng của câu hỏi */
+            border-bottom: 1px solid #e0e0e0; /* Đường kẻ dưới mỗi câu hỏi */
         }
 
         button {
@@ -42,6 +44,9 @@
             font-size: 1em; /* Kích thước chữ cho nút */
             cursor: pointer; /* Con trỏ chuột cho nút */
             transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+            margin-top: 10px; /* Khoảng cách trên của nút */
+            display: block; /* Làm cho nút chiếm toàn bộ chiều rộng */
+            width: 100%; /* Chiều rộng 100% */
         }
 
         button:hover {
@@ -51,39 +56,57 @@
         /* Thiết lập cho phần câu hỏi */
         p {
             font-weight: bold; /* In đậm câu hỏi */
+            margin: 0 0 5px; /* Loại bỏ khoảng cách mặc định và thêm khoảng cách dưới cùng */
+        }
+
+        /* Cải thiện giao diện nút radio */
+        input[type="radio"] {
+            margin-right: 10px; /* Khoảng cách bên phải cho nút radio */
         }
     </style>
 </head>
 <body>
     <h1>Thi Trắc Nghiệm</h1>
-    <form id="quizForm" >
+    <form id="quizForm">
         <div id="questions"></div>
         <button type="submit">Nộp Bài</button>
     </form>
 
     <script>
-        // Lấy câu hỏi từ server
+        // Lấy câu hỏi từ server và hiển thị
         fetch('/api/questions')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(questions => {
                 const questionsDiv = document.getElementById('questions');
-                questions.forEach((question, index) => {
+                questions.forEach((question) => {
                     const questionDiv = document.createElement('div');
                     questionDiv.innerHTML = `<p>${question.question}</p>`;
                     question.options.forEach(option => {
-                        questionDiv.innerHTML += `<input type="radio" name="question${index}" value="${option}" required> ${option}<br>`;
+                        questionDiv.innerHTML += `<label>
+                                                     <input type="radio" name="${question._id}" value="${option}" required>
+                                                     ${option}
+                                                 </label><br>`;
                     });
                     questionsDiv.appendChild(questionDiv);
                 });
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                document.getElementById('questions').innerHTML = `<p>Không thể tải câu hỏi. Vui lòng thử lại sau.</p>`;
             });
 
-       // Xử lý form nộp bài
+        // Xử lý form nộp bài
         document.getElementById('quizForm').onsubmit = function (event) {
             event.preventDefault();
             const formData = new FormData(quizForm);
             const data = {};
             for (const [key, value] of formData.entries()) {
-                data[key] = value;
+                data[key] = value; // key là _id của câu hỏi
             }
 
             fetch('/api/result', {
@@ -93,9 +116,18 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(result => {
                 window.location.href = `result.html?score=${result.score}&total=${result.total}`;
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                alert("Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.");
             });
         };
     </script>

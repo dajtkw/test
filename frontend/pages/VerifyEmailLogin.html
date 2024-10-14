@@ -113,7 +113,7 @@
             const data = Object.fromEntries(formData);
 
             try {
-                const response = await fetch('/verify-email', {
+                const response = await fetch('/verify-email-login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -126,7 +126,7 @@
                 const messageDiv = document.getElementById('message');
                 if (response.ok) {
                     // Redirect if verification is successful
-                    window.location.href = "/login";
+                    window.location.href = "/api/prepareToExam";
                 } else {
                     // Display error if any
                     messageDiv.innerText = result.message || "Đã xảy ra lỗi";

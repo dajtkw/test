@@ -149,8 +149,8 @@
     
                 if (response.ok) {
                     // Chuyển hướng nếu đăng nhập thành công
-                    alert("Đăng nhập thành công");
-                    window.location.href = "/prepareToExam"; 
+                    alert("Xác thực tài khoản");
+                    window.location.href = "/verify-email-login"; 
                 } else {
                     // Hiển thị lỗi nếu có
                     alert(result.message || "Đã xảy ra lỗi");

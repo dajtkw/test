@@ -16,6 +16,7 @@
             justify-content: center;
             height: 100vh;
             position: relative; /* Cần thiết để căn chỉnh nút logout */
+            animation: fadeIn 2s ease-in-out;
         }
 
         h1 {
@@ -25,7 +26,7 @@
             margin-bottom: 20px;
         }
 
-        a {
+        a, button {
             display: inline-block;
             padding: 15px 30px;
             font-size: 1.2rem;
@@ -33,11 +34,15 @@
             background-color: #3498db;
             border-radius: 8px;
             text-decoration: none;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Thêm hiệu ứng chuyển màu và phóng to */
+            border: none; /* Loại bỏ viền */
+            cursor: pointer; /* Đổi con trỏ thành dạng tay */
+            margin: 10px; /* Khoảng cách giữa các nút */
         }
 
-        a:hover {
-            background-color: #2980b9;
+        a:hover, button:hover {
+            background-color: #2980b9; /* Màu nền khi hover */
+            transform: scale(1.1); /* Phóng to khi hover */
         }
 
         /* Style cho nút Logout */
@@ -45,23 +50,11 @@
             position: absolute; /* Để nút nằm ở góc phải */
             top: 20px;  /* Khoảng cách từ trên cùng */
             right: 20px; /* Khoảng cách từ bên phải */
-            padding: 10px 20px;
-            font-size: 1rem;
-            color: #fff;
             background-color: #e74c3c; /* Màu đỏ cho nút logout */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
 
         #logoutButton:hover {
             background-color: #c0392b; /* Tối hơn khi hover */
-        }
-
-        /* Animation to fade in content */
-        body {
-            animation: fadeIn 2s ease-in-out;
         }
 
         @keyframes fadeIn {
@@ -73,10 +66,27 @@
 <body>
     <button id="logoutButton">Đăng Xuất</button>
     <h1>Chào Mừng Đến Với Trang Thi Trắc Nghiệm</h1>
-    <a href="question.html" id="startQuiz">Bắt Đầu Thi</a>
+    <button id="startQuiz">Bắt Đầu Thi</button>
 
     <script>
-       
+        async function startQuiz() {
+            try {
+                const response = await fetch("/api/prepareToExam", {
+                    method: "POST",
+                    credentials: "include" // Gửi cookie cần với yêu cầu
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = "/questions"; // Chuyển hướng về trang phần câu hỏi
+                } else {
+                    console.error("Không thể bắt đầu thi:", data.message);
+                }
+            } catch (error) {
+                console.error("Lỗi không chuyển hướng sang phần câu hỏi:", error);
+            }
+        }
+
         // Hàm để đăng xuất
         async function logout() {
             try {
@@ -88,19 +98,17 @@
                 const data = await response.json();
                 if (data.success) {
                     window.location.href = "/login"; // Chuyển hướng về trang đăng nhập
+                } else {
+                    console.error("Đăng xuất không thành công:", data.message);
                 }
             } catch (error) {
-                console.error("Error during logout:", error);
+                console.error("Lỗi trong quá trình đăng xuất:", error);
             }
         }
 
-        // Gán sự kiện cho nút đăng xuất
+        // Gán sự kiện cho nút đăng xuất và nút bắt đầu thi
         document.getElementById('logoutButton').onclick = logout;
-
-        // Hiển thị trang thi khi nhấn vào "Bắt Đầu Thi"
-        document.getElementById('startQuiz').onclick = function () {
-            window.location.href = 'question.html';
-        };
+        document.getElementById('startQuiz').onclick = startQuiz;
     </script>
 </body>
 </html>

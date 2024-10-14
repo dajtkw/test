@@ -1,9 +1,9 @@
 // import express from "express";
 // import cookieParser from 'cookie-parser';
 import jwt from "jsonwebtoken";
-// const app = express(); 
-// app.use(cookieParser());
-export const verifyToken = (req, res, next) => {
+import User from "../models/user.model.js";
+;
+export const verifyToken = async (req, res, next) => {
 	const token = req.cookies.token;
 	console.log(token);
 	if (!token) {
@@ -12,8 +12,8 @@ export const verifyToken = (req, res, next) => {
 	} 
 	try {
 		const decoded = jwt.verify(token, 'your_secret_key');
-
-		if (!decoded) {
+		const user = await User.findById(decoded.userId);
+		if (!decoded || !user.isLoggedIn) {
 			
 			return res.redirect('/login');
 		} 

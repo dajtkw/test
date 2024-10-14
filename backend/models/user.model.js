@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
-
+		isLoggedIn: { type: Boolean, default: false },
 		score: String,
 
 		resetPasswordToken: String,
