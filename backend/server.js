@@ -13,6 +13,7 @@ import { fileURLToPath } from "url";
 import { verifyToken } from "./middleware/verifyToken.js";
 import {
   sendPasswordResetEmail,
+  sendResetSuccessEmail,
   sendVerificationEmail,
   sendWelcomeEmail,
 } from "./mail/email.js";
@@ -72,6 +73,73 @@ app.get("/verify-email-login", (req, res) => {
 	);
   });
 
+  app.get("/forgot-password", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/pages/ForgotPassword.html"));
+  });
+
+  app.get("/reset-password", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/pages/reset-password.html"));
+  });
+
+  app.get("/send-successful-email", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/pages/SendFPSuccess.html"));
+  });
+
+  app.get("check-auth", async (req, res) => {
+    try {
+      const user = await User.findById(req.userId).select("-password");
+      if (!user) {
+        return res
+          .status(400)
+          .json({ success: false, message: "User not found" });
+      }
+  
+      res.status(200).json({ success: true, user });
+    } catch (error) {
+      console.log("Error in checkAuth ", error);
+      res.status(400).json({ success: false, message: error.message });
+    }
+  });
+
+
+  app.get("/api/prepareToExam", verifyToken, (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/pages/prepareToExam.html"));
+  });
+  
+  app.get('/api/userInfo',verifyToken, async(req, res) => {
+    const user = await User.findById(req.userId);
+    console.log(user);
+    if (user) {
+        // Trả về thông tin người dùng
+        res.json({
+            success: true,
+            user: {
+                name: user.fullname,
+                dob:user.DayOfBirth,
+                email: user.email,
+                cccd: user.cccd,
+            }
+        });
+    } else {
+        res.json({
+            success: false,
+            message: "Người dùng chưa đăng nhập"
+        });
+    }
+  });
+
+  app.get("/questions", verifyToken, async (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/pages/question.html"));
+  });
+
+  app.get("/api/questions", verifyToken, async (req, res) => {
+    try {
+        const questions = await Question.aggregate([{ $sample: { size: 10 } }]); // Lấy ngẫu nhiên 10 câu hỏi
+        res.json(questions); // Gửi câu hỏi đến client
+    } catch (error) {
+        res.status(500).json({ message: "Có lỗi xảy ra khi lấy câu hỏi." });
+    }
+});
 app.post("/signup", async (req, res) => {
   const { fullname, DayOfBirth, phonenumber, cccd, email, password } = req.body;
 
@@ -202,13 +270,13 @@ app.post("/login", async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid credentials" });
+        .json({ success: false, message: "User not exists" });
     }
     const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid credentials" });
+        .json({ success: false, message: "Your email or password is wrong" });
     }
 
     generateTokenAndSetCookie(res, user._id);
@@ -234,9 +302,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/forgot-password", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/pages/ForgotPassword.html"));
-});
+
 
 app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
@@ -255,13 +321,14 @@ app.post("/forgot-password", async (req, res) => {
 
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpiresAt = resetTokenExpiresAt;
-
+    console.log("resetToken",resetToken)
+    console.log("resetTokenExpiresAt",resetTokenExpiresAt)
     await user.save();
 
     // send email
     await sendPasswordResetEmail(
       user.email,
-      `http://localhost:5000/reset-password/${resetToken}`
+      `http://localhost:5000/reset-password?token=${resetToken}`
     );
 
     res.status(200).json({
@@ -274,19 +341,23 @@ app.post("/forgot-password", async (req, res) => {
   }
 });
 
-app.get("/send-successful-email", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/pages/SendFPSuccess.html"));
-});
+
 
 app.post("/reset-password/:token", async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
 
+    console.log("password",password)
+    console.log("debug1",token);
+    console.log("Current Time: ", Date.now());
+
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpiresAt: { $gt: Date.now() },
-    });
+  });
+
+    console.log("debug2.2",user);
 
     if (!user) {
       return res
@@ -296,7 +367,7 @@ app.post("/reset-password/:token", async (req, res) => {
 
     // update password
     const hashedPassword = await bcryptjs.hash(password, 10);
-
+    console.log("debug3",hashedPassword);
     user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpiresAt = undefined;
@@ -313,90 +384,52 @@ app.post("/reset-password/:token", async (req, res) => {
   }
 });
 
-app.get("check-auth", async (req, res) => {
-  try {
-    const user = await User.findById(req.userId).select("-password");
-    if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User not found" });
-    }
 
-    res.status(200).json({ success: true, user });
-  } catch (error) {
-    console.log("Error in checkAuth ", error);
-    res.status(400).json({ success: false, message: error.message });
-  }
-});
 
-//Thêm câu hỏi
-app.post("/api/questions", async (req, res) => {
-  const questions = req.body; // expecting an array of question objects
-  console.log("Received:", questions);
+// //Thêm câu hỏi
+// app.post("/api/questions", async (req, res) => {
+//   const questions = req.body; // expecting an array of question objects
+//   console.log("Received:", questions);
 
-  // Check if the request body is an array and it has at least one question
-  if (!Array.isArray(questions) || questions.length === 0) {
-    return res
-      .status(400)
-      .send("Invalid request body. Expected an array of questions.");
-  }
+//   // Check if the request body is an array and it has at least one question
+//   if (!Array.isArray(questions) || questions.length === 0) {
+//     return res
+//       .status(400)
+//       .send("Invalid request body. Expected an array of questions.");
+//   }
 
-  // Validate each question in the array
-  for (let questionObj of questions) {
-    const { question, options, answer } = questionObj;
-    if (!question || !options || !answer) {
-      return res.status(400).send("Missing fields in one or more questions.");
-    }
-  }
+//   // Validate each question in the array
+//   for (let questionObj of questions) {
+//     const { question, options, answer } = questionObj;
+//     if (!question || !options || !answer) {
+//       return res.status(400).send("Missing fields in one or more questions.");
+//     }
+//   }
 
-  try {
-    // Insert all questions using insertMany
-    const newQuestions = await Question.insertMany(questions);
-    res
-      .status(201)
-      .send(`${newQuestions.length} questions added successfully!`);
-  } catch (err) {
-    console.error("Error adding questions:", err);
-    res.status(500).send("Error adding questions");
-  }
-});
+//   try {
+//     // Insert all questions using insertMany
+//     const newQuestions = await Question.insertMany(questions);
+//     res
+//       .status(201)
+//       .send(`${newQuestions.length} questions added successfully!`);
+//   } catch (err) {
+//     console.error("Error adding questions:", err);
+//     res.status(500).send("Error adding questions");
+//   }
+// });
 
-// API sửa câu hỏi
-app.put("/api/questions/:id", async (req, res) => {
-  const { question, options, answer } = req.body;
-  await Question.findByIdAndUpdate(req.params.id, {
-    question,
-    options,
-    answer,
-  });
-  res.send("Question updated successfully!");
-});
+// // API sửa câu hỏi
+// app.put("/api/questions/:id", async (req, res) => {
+//   const { question, options, answer } = req.body;
+//   await Question.findByIdAndUpdate(req.params.id, {
+//     question,
+//     options,
+//     answer,
+//   });
+//   res.send("Question updated successfully!");
+// });
 
-app.get("/api/prepareToExam", verifyToken, (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/pages/prepareToExam.html"));
-});
 
-app.get('/api/userInfo',verifyToken, async(req, res) => {
-  const user = await User.findById(req.userId);
-  console.log(user);
-  if (user) {
-      // Trả về thông tin người dùng
-      res.json({
-          success: true,
-          user: {
-              name: user.fullname,
-              dob:user.DayOfBirth,
-              email: user.email,
-              cccd: user.cccd,
-          }
-      });
-  } else {
-      res.json({
-          success: false,
-          message: "Người dùng chưa đăng nhập"
-      });
-  }
-});
 
 app.post("/api/prepareToExam", verifyToken, async (req, res) => {
   try {
@@ -417,27 +450,18 @@ app.post("/api/prepareToExam", verifyToken, async (req, res) => {
   }
 });
 
-app.get("/questions", verifyToken, async (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/pages/question.html"));
-});
 
-app.get("/api/questions", verifyToken, async (req, res) => {
-  try {
-    const questions = await Question.aggregate([{ $sample: { size: 10 } }]); // Lấy ngẫu nhiên 10 câu hỏi
-    res.json(questions);
-  } catch (error) {
-    res.status(500).json({ message: "Có lỗi xảy ra khi lấy câu hỏi." });
-  }
-});
 
-app.get("/api/questions", verifyToken, async (req, res) => {
-    try {
-        const questions = await Question.aggregate([{ $sample: { size: 10 } }]); // Lấy ngẫu nhiên 10 câu hỏi
-        res.json(questions); // Gửi câu hỏi đến client
-    } catch (error) {
-        res.status(500).json({ message: "Có lỗi xảy ra khi lấy câu hỏi." });
-    }
-});
+// app.get("/api/questions", verifyToken, async (req, res) => {
+//   try {
+//     const questions = await Question.aggregate([{ $sample: { size: 10 } }]); // Lấy ngẫu nhiên 10 câu hỏi
+//     res.json(questions);
+//   } catch (error) {
+//     res.status(500).json({ message: "Có lỗi xảy ra khi lấy câu hỏi." });
+//   }
+// });
+
+
 
 app.post("/api/result", verifyToken, async (req, res) => {
     try {
