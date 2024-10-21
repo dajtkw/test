@@ -5,17 +5,17 @@ import User from "../models/user.model.js";
 ;
 export const verifyToken = async (req, res, next) => {
 	const token = req.cookies.token;
-	console.log(token);
+	
 	if (!token) {
 		
-		return res.redirect('/login');
+		return res.redirect('/Welcome.html');
 	} 
 	try {
 		const decoded = jwt.verify(token, 'your_secret_key');
 		const user = await User.findById(decoded.userId);
 		if (!decoded || !user.isLoggedIn) {
 			
-			return res.redirect('/login');
+			return res.redirect('/Welcome.html');
 		} 
 
 		req.userId = decoded.userId;

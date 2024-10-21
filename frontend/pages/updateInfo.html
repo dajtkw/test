@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập nhật Thông tin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e9ecef;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .dashboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #4CAF50;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            max-width: 90%;
+            margin: auto;
+            /* Thay đổi để căn giữa */
+            margin-top: 70px;
+            /* Đẩy xuống dưới thanh điều hướng */
+            flex: 1;
+            /* Để tạo không gian cho footer */
+        }
+
+        h2 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        label {
+            margin-top: 15px;
+            display: block;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        input[readonly] {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            background-color: #3f5252;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            width: 100%;
+            /* Thay đổi để footer có chiều rộng đầy đủ */
+        }
+
+        .footer-links {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: text-decoration 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+    <a class="dashboard" href="/">DDH TEAM</a>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Cập nhật Thông tin</h2>
+        <form id="updateForm">
+            <label for="name">Xin chào:</label>
+            <input type="text" id="name" value = "dat" required>
+
+            <label for="dob">Ngày sinh:</label>
+            <input type="date" id="dob" required>
+
+            <label for="cccd">CCCD:</label>
+            <input type="text" id="cccd" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" readonly>
+
+            <label for="phone">Điện thoại:</label>
+            <input type="text" id="phone" required>
+
+            <button type="button" onclick="updateInfo()">Cập nhật</button>
+        </form>
+    </div>
+
+    <script>
+        // Hàm để lấy thông tin người dùng từ server
+
+        async function fetchUserData() {
+    try {
+        const response = await fetch("/api/userInfo", {
+            method: "GET",
+            credentials: "include"
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            console.log("debug update", data.user);
+            console.log("debug name", data.user.name);
+            document.getElementById('name').value = data.user.name || '';
+
+            // Kiểm tra ngày sinh
+            if (data.user.dob) {
+                const dobFormatted = data.user.dob.split('T')[0];
+                console.log("debug dob", dobFormatted);
+                document.getElementById('dob').value = dobFormatted;
+            } else {
+                console.error("Ngày sinh không được cung cấp.");
+                document.getElementById('dob').value = '';
+            }
+
+            document.getElementById('cccd').value = data.user.cccd || '';
+            document.getElementById('email').value = data.user.email || ''; // Để nó trống nếu không có
+            document.getElementById('phone').value = data.user.phone || '';
+        } else {
+            console.error("Không thể lấy thông tin người dùng:", data.message);
+        }
+    } catch (error) {
+        console.error("Lỗi không lấy được thông tin người dùng:", error);
+    }
+}
+
+        // Hàm để cập nhật thông tin
+        function updateInfo() {
+            const name = document.getElementById('name').value;
+            const dob = document.getElementById('dob').value;
+            const cccd = document.getElementById('cccd').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            
+            const userData = {
+                name,
+                dob,
+                cccd,
+                phone,
+                email
+            };
+            console.log("debug", JSON.stringify(userData));
+            fetch("/api/updateUser", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                if (data.success) {
+                    alert("Cập nhật thông tin thành công!");
+                    window.location.href = "/";
+                } else {
+                    alert("Đã có lỗi xảy ra khi cập nhật: " + data.message);
+                }
+            });
+        }
+
+        // Gọi hàm để lấy dữ liệu người dùng khi tải trang
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchUserData();
+        });
+    </script>
+
+
+</body>
+<footer>
+    <div class="footer-links">
+        <a href="feedback.html">Feedback</a>
+        <a href="help.html">Help</a>
+        <a href="termsCondition.html">Terms & Conditions</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="about.html">About DDH</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="https://chatgpt.com/">Connect with a partner</a>
+        <a href="donate.html">Donate for our team</a>
+    </div>
+    <p>©2024 DDH Team.</p>
+</footer>
+
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            /* Đảm bảo footer ở dưới cùng */
+        }
+
+        .dashboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #4CAF50;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        #logout {
+            position: fixed;
+            /* Giữ vị trí cố định */
+            top: 20px;
+            /* Khoảng cách từ trên cùng */
+            right: 20px;
+            /* Khoảng cách từ bên phải */
+            background-color: #e74c3c;
+            /* Màu đỏ cho nút logout */
+            color: white;
+            /* Màu chữ */
+            border: none;
+            /* Không có viền */
+            border-radius: 5px;
+            /* Bo tròn góc */
+            padding: 10px 20px;
+            /* Khoảng trắng trong nút */
+            cursor: pointer;
+            /* Hiển thị dạng con trỏ khi hover */
+            z-index: 1001;
+            /* Đảm bảo nút ở trên cùng */
+            transition: background-color 0.3s ease;
+            /* Hiệu ứng chuyển màu */
+        }
+
+        #logout:hover {
+            background-color: #c0392b;
+            /* Tối hơn khi hover */
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            margin-top: 80px;
+            /* Để tránh header chồng lên nội dung */
+            flex: 1;
+            /* Đảm bảo container chiếm không gian còn lại */
+        }
+
+        .personal-profile {
+            flex: 1;
+            margin-right: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .study-materials {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        h2 {
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .personal-profile p {
+            margin: 8px 0;
+            font-size: 1rem;
+        }
+
+        .update-info {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .update-info:hover {
+            background-color: #0056b3;
+        }
+
+        .subject-selection a {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .subject-selection a:hover {
+            background-color: #218838;
+        }
+
+        .study-materials ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .study-materials li a {
+            display: block;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 5px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .study-materials li a:hover {
+            background-color: #0056b3;
+        }
+
+        .user-info {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #34495e;
+            text-align: left;
+        }
+
+        footer {
+            background-color: #3f5252;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 20px;
+            /* Đẩy footer một chút xuống */
+        }
+
+        .footer-links {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: text-decoration 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .personal-profile,
+            .study-materials {
+                margin-right: 0;
+                margin-bottom: 20px;
+                /* Khoảng cách giữa hai phần */
+            }
+
+            #logout {
+                position: static;
+                /* Đặt lại vị trí logout cho màn hình nhỏ */
+                margin-top: 10px;
+            }
+        }
+    </style>
+    <a class="dashboard" href="/">DDH TEAM</a>
+</head>
+
+<body>
+    <button id="logout">Đăng Xuất</button>
+
+    <div class="container">
+        <section class="personal-profile">
+            <h2>Hồ sơ cá nhân</h2>
+            <div class="user-info" id="userInfo"></div>
+            <a class="update-info" href="/updateUser">Cập nhật thông tin</a>
+        </section>
+
+        <section class="study-materials">
+            <h2>Các tài liệu ôn tập</h2>
+            <div class="subject-selection">
+                <h3>Chọn môn thi</h3>
+                <a href="/api/prepareToExam">BMTT</a>
+            </div>
+            <h3>Tài liệu học tập</h3>
+            <ul>
+                <li><a href="https://www.geeksforgeeks.org/cyber-security-tutorial/">Tài liệu ôn thi</a></li>
+            </ul>
+        </section>
+    </div>
+
+    <script>
+        function formatDate(isoDate) {
+            const date = new Date(isoDate);
+            const day = String(date.getUTCDate()).padStart(2, '0'); // Lấy ngày
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Tháng (cộng thêm 1 vì tháng tính từ 0)
+            const year = date.getUTCFullYear(); // Lấy năm
+            return `${day}/${month}/${year}`; // Định dạng ngày
+        }
+
+        async function fetchUserInfo() {
+            try {
+                const response = await fetch("/api/userInfo", {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    console.log(data)
+                    const userInfoDiv = document.getElementById('userInfo');
+                    const formattedDob = formatDate(data.user.dob);
+                    userInfoDiv.innerHTML = `Xin chào, ${data.user.name}! <br> Ngày sinh: ${formattedDob} <br> CCCD: ${data.user.cccd}  <br> Email: ${data.user.email} <br> Điện thoại: ${data.user.phone} <br> Điểm: ${data.user.score}`;
+                    if (data.user.score >= 0 && data.user.score <= 10) {
+                        document.querySelector('.subject-selection').innerHTML = `
+                    <h3>Thông báo</h3>
+                    <p>Hiện tại bạn đã thi xong hết môn.</p>`;
+                        // Ẩn hoặc vô hiệu hóa liên kết đến phần thi
+                        const subjectLinks = document.querySelectorAll('.subject-selection a');
+                        subjectLinks.forEach(link => {
+                            link.style.display = 'none';
+                        });
+                    }
+                } else {
+                    console.error("Không thể lấy thông tin người dùng:", data.message);
+                }
+            } catch (error) {
+                console.error("Lỗi không lấy được thông tin người dùng:", error);
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch("/logout", {
+                    method: "POST",
+                    credentials: "include" // Gửi cookie cùng với yêu cầu
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = "/Welcome.html"; // Chuyển hướng về trang đăng nhập
+                } else {
+                    console.error("Đăng xuất không thành công:", data.message);
+                }
+            } catch (error) {
+                console.error("Lỗi trong quá trình đăng xuất:", error);
+            }
+        }
+
+        document.getElementById('logout').onclick = logout;
+        fetchUserInfo();
+    </script>
+
+    <footer>
+        <div class="footer-links">
+            <a href="feedback.html">Feedback</a>
+            <a href="help.html">Help</a>
+            <a href="termsCondition.html">Terms & Conditions</a>
+            <a href="privacy.html">Privacy</a>
+            <a href="about.html">About DDH</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="https://chatgpt.com/">Connect with a partner</a>
+            <a href="donate.html">Donate for our team</a>
+        </div>
+        <p>©2024 DDH Team.</p>
+    </footer>
+</body>
+
+</html>

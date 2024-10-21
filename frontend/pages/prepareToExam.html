@@ -92,39 +92,39 @@
 </head>
 
 <body>
-    <button id="logoutButton">Đăng Xuất</button>
+    <!-- <button id="logoutButton">Đăng Xuất</button> -->
     <h1>Chào Mừng Đến Với Trang Thi Trắc Nghiệm</h1>
     <div class="user-info" id="userInfo"></div> <!-- Phần hiển thị thông tin người dùng -->
     <button id="startQuiz">Bắt Đầu Thi</button>
 
     <script>
 
-        function formatDate(isoDate) {
-            const date = new Date(isoDate);
-            const day = String(date.getUTCDate()).padStart(2, '0'); // Lấy ngày
-            const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Tháng (cộng thêm 1 vì tháng tính từ 0)
-            const year = date.getUTCFullYear(); // Lấy năm
-            return `${day}/${month}/${year}`; // Định dạng ngày
-        }
-        async function fetchUserInfo() {
-            try {
-                const response = await fetch("/api/userInfo", {
-                    method: "GET",
-                    credentials: "include" // Gửi cookie cần với yêu cầu
-                });
+        // function formatDate(isoDate) {
+        //     const date = new Date(isoDate);
+        //     const day = String(date.getUTCDate()).padStart(2, '0'); // Lấy ngày
+        //     const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Tháng (cộng thêm 1 vì tháng tính từ 0)
+        //     const year = date.getUTCFullYear(); // Lấy năm
+        //     return `${day}/${month}/${year}`; // Định dạng ngày
+        // }
+        // async function fetchUserInfo() {
+        //     try {
+        //         const response = await fetch("/api/userInfo", {
+        //             method: "GET",
+        //             credentials: "include" // Gửi cookie cần với yêu cầu
+        //         });
 
-                const data = await response.json();
-                if (data.success) {
-                    const userInfoDiv = document.getElementById('userInfo');
-                    const formattedDob = formatDate(data.user.dob);
-                    userInfoDiv.innerHTML = `Xin chào, ${data.user.name}! <br> Ngày sinh: ${formattedDob} <br> CCCD: ${data.user.cccd}  <br> Email: ${data.user.email}  `; // Hiển thị thông tin người dùng
-                } else {
-                    console.error("Không thể lấy thông tin người dùng:", data.message);
-                }
-            } catch (error) {
-                console.error("Lỗi không lấy được thông tin người dùng:", error);
-            }
-        }
+        //         const data = await response.json();
+        //         if (data.success) {
+        //             const userInfoDiv = document.getElementById('userInfo');
+        //             const formattedDob = formatDate(data.user.dob);
+        //             userInfoDiv.innerHTML = `Xin chào, ${data.user.name}! <br> Ngày sinh: ${formattedDob} <br> CCCD: ${data.user.cccd}  <br> Email: ${data.user.email}  `; // Hiển thị thông tin người dùng
+        //         } else {
+        //             console.error("Không thể lấy thông tin người dùng:", data.message);
+        //         }
+        //     } catch (error) {
+        //         console.error("Lỗi không lấy được thông tin người dùng:", error);
+        //     }
+        // }
         async function startQuiz() {
             try {
                 const response = await fetch("/api/prepareToExam", {
@@ -144,28 +144,28 @@
         }
 
         // Hàm để đăng xuất
-        async function logout() {
-            try {
-                const response = await fetch("/logout", {
-                    method: "POST",
-                    credentials: "include" // Gửi cookie cùng với yêu cầu
-                });
+        // async function logout() {
+        //     try {
+        //         const response = await fetch("/logout", {
+        //             method: "POST",
+        //             credentials: "include" // Gửi cookie cùng với yêu cầu
+        //         });
 
-                const data = await response.json();
-                if (data.success) {
-                    window.location.href = "/login"; // Chuyển hướng về trang đăng nhập
-                } else {
-                    console.error("Đăng xuất không thành công:", data.message);
-                }
-            } catch (error) {
-                console.error("Lỗi trong quá trình đăng xuất:", error);
-            }
-        }
+        //         const data = await response.json();
+        //         if (data.success) {
+        //             window.location.href = "/login"; // Chuyển hướng về trang đăng nhập
+        //         } else {
+        //             console.error("Đăng xuất không thành công:", data.message);
+        //         }
+        //     } catch (error) {
+        //         console.error("Lỗi trong quá trình đăng xuất:", error);
+        //     }
+        // }
 
         // Gán sự kiện cho nút đăng xuất và nút bắt đầu thi
-        document.getElementById('logoutButton').onclick = logout;
+        // document.getElementById('logoutButton').onclick = logout;
         document.getElementById('startQuiz').onclick = startQuiz;
-        fetchUserInfo();
+        // fetchUserInfo();
 
     </script>
 </body>

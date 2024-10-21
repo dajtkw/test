@@ -49,6 +49,10 @@ app.use(cookieParser());
 
 const PORT = 5000;
 
+app.get("/", verifyToken, (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/pages/dashboard.html"));
+})
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/pages/Welcome.html"));
 });
@@ -85,30 +89,47 @@ app.get("/verify-email-login", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/pages/SendFPSuccess.html"));
   });
 
-  app.get("check-auth", async (req, res) => {
-    try {
-      const user = await User.findById(req.userId).select("-password");
-      if (!user) {
-        return res
-          .status(400)
-          .json({ success: false, message: "User not found" });
-      }
+  // app.get("check-auth", async (req, res) => {
+  //   try {
+  //     const user = await User.findById(req.userId).select("-password");
+  //     if (!user) {
+  //       return res
+  //         .status(400)
+  //         .json({ success: false, message: "User not found" });
+  //     }
   
-      res.status(200).json({ success: true, user });
-    } catch (error) {
-      console.log("Error in checkAuth ", error);
-      res.status(400).json({ success: false, message: error.message });
-    }
-  });
+  //     res.status(200).json({ success: true, user });
+  //   } catch (error) {
+  //     console.log("Error in checkAuth ", error);
+  //     res.status(400).json({ success: false, message: error.message });
+  //   }
+  // });
 
+  app.get("/updateUser", verifyToken, async (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/pages/updateInfo.html"));
+  })
 
   app.get("/api/prepareToExam", verifyToken, (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/pages/prepareToExam.html"));
   });
   
+  app.post('/api/updateUser', async (req, res) => {
+    const { name, dob, cccd, phone, email } = req.body;
+    console.log(email)
+    const user = await User.findOne({ email });
+    console.log(user)
+    if (user) {
+      await User.updateOne({ email }, { $set: { fullname: name, DayOfBirth: dob, cccd: cccd, phonenumber: phone } });
+        
+
+        return res.json({ success: true, message: "Updated successfully" });
+    } else {
+        return res.status(404).json({ success: false, message: "error" });
+    }
+});
+
   app.get('/api/userInfo',verifyToken, async(req, res) => {
     const user = await User.findById(req.userId);
-    console.log(user);
     if (user) {
         // Trả về thông tin người dùng
         res.json({
@@ -118,6 +139,8 @@ app.get("/verify-email-login", (req, res) => {
                 dob:user.DayOfBirth,
                 email: user.email,
                 cccd: user.cccd,
+                phone: user.phonenumber,
+                score: user.score
             }
         });
     } else {
@@ -441,6 +464,8 @@ app.post("/api/prepareToExam", verifyToken, async (req, res) => {
         .json({ success: false, message: "Người dùng không hợp lệ." });
     }
 
+    
+  
     res
       .status(200)
       .json({ success: true, message: "Đã chuẩn bị xong cho kỳ thi." });
